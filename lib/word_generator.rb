@@ -1,5 +1,8 @@
+require 'date'
+
 class NumberToWord
 	def convert_to_word(number)
+		time_start = Time.now()
 		return [] if invalid_input(number)
 		letters = {
 					"2" => ["a", "b", "c"],
@@ -14,6 +17,10 @@ class NumberToWord
 		keys = number.split('').map{|num|letters[num]}
 		dictionary = load_dictonary
 		result = matced_words(dictionary, keys)
+		expected_result = final_words(result,keys,dictionary)
+		time_end = Time.now()
+    	time_taken = time_end.to_f - time_start.to_f
+    	return {time_taken: time_taken, result: expected_result}
 	end
 
 	private
@@ -48,6 +55,19 @@ class NumberToWord
 	      results[i] = [(first_combination & dictionary[i+2]), (second_combination & dictionary[total_number - i +1])]
     	end
     	return results
+	end
+
+	def final_words(results,keys,dictionary)
+		final_words = []
+	    results.each do |key, combinataions|
+	      next if combinataions.first.nil? || combinataions.last.nil?
+	      combinataions.first.product(combinataions.last).each do |combo_words|
+	        final_words << combo_words
+	      end
+	    end
+    # for all numbers
+    	final_words << (keys.shift.product(*keys).map(&:join) & dictionary[11]).join(", ")
+    	return final_words
 	end
 end
 
